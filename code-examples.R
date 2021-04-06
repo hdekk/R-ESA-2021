@@ -2,7 +2,9 @@
 # Instructor: harrison Dekker, URI Libraries and AI Lab
 # Contact: hdekker@uri.edu
 
-# Attribution: This lesson was adapted from https://rpubs.com/NickCHK/RTeach2020
+# Attribution: 
+# This lesson was adapted from "Teaching Econometrics with R" by Nick Huntington-Klein.
+# The original slides can be found at https://rpubs.com/NickCHK/RTeach2020
 
 ################################################################################
 ## SETUP
@@ -91,7 +93,8 @@ my.df$d[1] <- NA
 mean(my.df$d)
 mean(my.df$d, na.rm = TRUE)
 
-data("CO2")
+# Challenge
+# Explain why not all of you are showing the same mean value.
 
 ################################################################################
 ## GETTING DATA
@@ -123,22 +126,27 @@ data("CO2")
 # - MANY other, lesser, commands (including join functions (i.e. merge) and in 
 #   tidyr the pivot functions (reshape) - see the Data Wrangling swirl() or cheat sheet)
 
-# Example 1
 library(tidyverse)
 load("data/atusact.rda")
 head(atusact)
+
+# Fix the error
+atusact <- ungroup(atusact)
+head(atusact)
+
 str(atusact)
 summary(atusact)
+
+## Example 1
 # Make sure to overwrite old data so it updates!
 # Get two-digit and four-digit activity codes
 # Keep just personal care activities
 atusact <- atusact %>% 
-  ungroup() %>%
   mutate(two.digit.activity = floor(tiercode/10000),
          four.digit.activity = floor(tiercode/100)) %>% 
   filter(two.digit.activity == 1)
 
-# Example 2
+## Example 2
 # Get mean and SD of time spent in each of those activities
 atusact_summary <- atusact %>%
   # Group into the different four-digit activities
@@ -149,6 +157,10 @@ atusact_summary <- atusact %>%
   # Arrange by most often
   arrange(-mean.dur)
 atusact_summary  
+
+# Challenge:
+# In Example 2, modify the summarize function to add two more columns containing 
+# the group minimum and maximum. Hint: Use the functions min() and max().
 
 ################################################################################
 # REGRESSIONS
@@ -163,11 +175,13 @@ atusact_summary
 #   Some of the relevant statistics are in the summary() not the regression object itself
 
 load("data/atusresp.rda")
+
+lm(hourly_wage ~ hh_size + work_hrs_week, data = atusresp)
 my.reg <- lm(hourly_wage ~ hh_size + work_hrs_week, data = atusresp)
 my.reg2 <- lm(hourly_wage ~ hh_size + work_hrs_week + ptft, data = atusresp)
 reg.predictions <- predict(my.reg)
 
-
+# Viewing regressions outputs
 my.reg
 summary(my.reg)
 summary(my.reg)$r.squared
@@ -195,12 +209,10 @@ library(jtools)
 export_summs(my.reg, my.reg2, robust = TRUE, stars = c(`***` = 0.01, `**` =
                                                          0.05, `*` = 0.1), coefs = 'hh_size')
 
-## Regression Graphs in jtools
+## jtools example
 data(mtcars)
 carsreg <- lm(mpg~hp+I(hp^2)+cyl, data = mtcars)
 effect_plot(carsreg, pred = hp, plot.points = TRUE, interval = TRUE)
-
-plot_coefs(my.reg, my.reg2)
 
 ################################################################################
 # Regression Formulas
@@ -214,7 +226,6 @@ plot_coefs(my.reg, my.reg2)
 # - Do calculations on variables first with I(): I(y == 1) ~ I(x^2)
 # - Lots of variables? y~. regresses on everything in the data but y. In the tidyverse, 
 #   combine this with “tidyselect” helpers like select(starts_with('gdp_'))
-
 
 ## Regression Commands
 
@@ -243,3 +254,11 @@ data("economics")
 plot <- ggplot(economics, aes(x = date, y = unemploy/pop)) + geom_line() + theme_bw() +
   labs(x = "Month", y = "Unemployment")
 plot
+
+
+################################################################################
+# LEARNING R
+################################################################################
+
+library(swirl)
+swirl()
